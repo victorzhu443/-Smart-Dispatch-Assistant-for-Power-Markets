@@ -1,0 +1,31 @@
+# docker-compose.yml for Smart Dispatch Forecast API (Phase 5.1)
+version: '3.8'
+
+services:
+  forecast-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smart-dispatch-forecast
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./market_data.db:/app/market_data.db:ro  # Read-only database mount
+      - ./logs:/app/logs  # Log directory
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - smart-dispatch-network
+
+networks:
+  smart-dispatch-network:
+    driver: bridge
+    name: smart-dispatch-net

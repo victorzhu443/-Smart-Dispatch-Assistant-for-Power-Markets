@@ -1,0 +1,24 @@
+# requirements.txt for Smart Dispatch Forecast API (Phase 5.1)
+
+# Core Flask dependencies
+Flask==2.3.3
+Flask-CORS==4.0.0
+
+# Database and data processing
+SQLAlchemy==2.0.21
+pandas==2.1.1
+numpy==1.24.3
+
+# Machine learning
+scikit-learn==1.3.0
+joblib==1.3.2
+
+# Environment and configuration
+python-dotenv==1.0.0
+
+# Development and testing
+pytest==7.4.2
+requests==2.31.0
+
+# Optional: For better performance
+gunicorn==21.2.0
