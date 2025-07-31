@@ -60,7 +60,7 @@ curl http://localhost:5001/forecast
 ```
 smart-dispatch-assistant/
 ├── 📋 README.md                    # This file
-├── 📄 Smart_Dispatch_PRD.pdf       # Complete requirements document
+├── 📄 PRD.md                       # Complete requirements document
 ├── 📊 data-ingestion/              # Phase 1: Market data APIs
 │   ├── ercot_api.py               # ERCOT data connector
 │   ├── data_pipeline.py           # ETL processing
