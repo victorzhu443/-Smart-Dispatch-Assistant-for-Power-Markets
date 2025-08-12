@@ -1,0 +1,27 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Smart Dispatch Assistant</title>
+  <!-- NOTE: path now matches your folder: static/css/styles.css -->
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="header">
+    <h1>⚡ Smart Dispatch Assistant</h1>
+    <nav>
+      <a href="/">Dashboard</a>
+      <a href="/chat/">Chat</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">Local demo • Django UI → Flask APIs</footer>
+</body>
+</html>

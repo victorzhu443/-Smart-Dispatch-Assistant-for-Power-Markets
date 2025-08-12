@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="card">
+  <h2>Forecast</h2>
+
+  <div class="row">
+    <label>Timestamp (optional):</label>
+    <input id="ts" type="datetime-local"/>
+    <button id="btnForecast">Get forecast</button>
+    <button id="btnNow">Now</button>
+    <label class="pill">
+      <input id="auto" type="checkbox" style="vertical-align:middle; margin-right:6px;"/>
+      Auto-refresh (30s)
+    </label>
+    <button id="btnClear">Clear</button>
+    <span id="latency" class="pill" style="display:none;"></span>
+  </div>
+
+  <div id="result" class="pill">—</div>
+  <canvas id="chart" height="110" style="margin-top:12px;"></canvas>
+</section>
+
+<script>
+const $ = (q)=>document.querySelector(q);
+
+let chart, data = { labels: [], prices: [] }, timer=null;
+
+function initChart(){
+  const ctx = document.getElementById("chart").getContext("2d");
+  chart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: data.labels,
+      datasets: [{ label: "Predicted Price (USD/MWh)", data: data.prices }]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: true } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+
+function addPoint(label, price){
+  data.labels.push(label);
+  data.prices.push(price);
+  chart.update();
+}
+
+function isoNowLocal(){
+  const d = new Date();
+  const pad = (n)=> String(n).padStart(2,"0");
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+async function fetchForecast(tsIso){
+  const url = tsIso ? `/api/forecast?timestamp=${encodeURIComponent(tsIso)}` : "/api/forecast";
+  const t0 = performance.now();
+  const res = await fetch(url);
+  const t1 = performance.now();
+  const body = await res.json();
+  const ms = Math.round(t1 - t0);
+  return { body, ms };
+}
+
+async function pull(tsIso){
+  try{
+    const { body, ms } = await fetchForecast(tsIso);
+    const price = Number(body.predicted_price);
+    const unit = body.currency || "USD/MWh";
+    $("#result").textContent = isFinite(price) ? `$${price.toFixed(2)} ${unit}` : "—";
+    const label = (body.timestamp || new Date().toISOString()).replace("T"," ").slice(0,16);
+    addPoint(label, price);
+    const lat = $("#latency");
+    lat.textContent = `Latency: ${ms} ms`;
+    lat.style.display = "inline-block";
+  }catch(e){
+    console.error(e);
+    $("#result").textContent = "Error fetching forecast";
+  }
+}
+
+$("#btnForecast").addEventListener("click", ()=>{
+  const raw = $("#ts").value;
+  pull(raw ? new Date(raw).toISOString() : undefined);
+});
+
+$("#btnNow").addEventListener("click", ()=>{
+  $("#ts").value = isoNowLocal();
+});
+
+$("#btnClear").addEventListener("click", ()=>{
+  data.labels = []; data.prices = []; chart.update(); $("#result").textContent = "—";
+});
+
+$("#auto").addEventListener("change", (e)=>{
+  if (e.target.checked){
+    timer = setInterval(()=> pull(undefined), 30000);
+    pull(undefined);
+  } else {
+    clearInterval(timer);
+  }
+});
+
+window.addEventListener("load", ()=>{
+  initChart();
+  pull(undefined); // prime
+});
+</script>
+{% endblock %}

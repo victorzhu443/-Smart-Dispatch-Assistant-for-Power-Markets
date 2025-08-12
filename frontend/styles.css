@@ -1,0 +1,18 @@
+:root { --bg:#0b1020; --card:#141a2a; --text:#e8eefc; --muted:#9fb3d8; --accent:#4c7dff; }
+*{ box-sizing: border-box; }
+body{ margin:0; font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Arial; background:var(--bg); color:var(--text); }
+.header{ display:flex; justify-content:space-between; align-items:center; padding:16px 24px; background:#0f1528; border-bottom:1px solid #223; }
+.header h1{ margin:0; font-size:20px; }
+.header nav a{ color:var(--muted); margin-left:16px; text-decoration:none; }
+.header nav a:hover{ color:var(--text); }
+.container{ max-width:960px; margin:24px auto; padding:0 16px; }
+.card{ background:var(--card); border:1px solid #223; border-radius:16px; padding:16px; box-shadow:0 8px 24px rgba(0,0,0,.25); }
+.row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+.pill{ padding:8px 12px; background:#1b2338; border-radius:999px; border:1px solid #2a3553; }
+button{ background:var(--accent); color:white; border:none; padding:8px 12px; border-radius:10px; cursor:pointer; }
+input{ padding:8px 10px; border-radius:8px; border:1px solid #2a3553; background:#0f1528; color:var(--text); }
+.chatbox{ background:#0e1425; border:1px solid #223; border-radius:12px; height:360px; overflow:auto; padding:12px; margin-bottom:12px; }
+.bubble{ max-width:72%; padding:10px 12px; border-radius:12px; margin:6px 0; }
+.bubble.user{ background:#16315d; margin-left:auto; }
+.bubble.bot{ background:#1b2338; margin-right:auto; }
+.footer{ text-align:center; color:#6f85b3; padding:16px; }
