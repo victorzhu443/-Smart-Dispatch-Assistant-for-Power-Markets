@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1 
+kind: Ingress 
+metadata: 
+  name: smart-dispatch-ingress 
+  namespace: smart-dispatch 
+spec: 
+  ingressClassName: nginx 
+  rules: 
+  - host: localhost 
+    http: 
+      paths: 
+      - path: /forecast 
+        pathType: Prefix 
+        backend: 
+          service: 
+            name: forecast-service 
+            port: 
+              number: 80 
+      - path: /query 
+        pathType: Prefix 
+        backend: 
+          service: 
+            name: query-service 
+            port: 
+              number: 80 
+      - path: /chat 
+        pathType: Prefix 
+        backend: 
+          service: 
+            name: query-service 

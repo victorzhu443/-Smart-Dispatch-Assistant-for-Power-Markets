@@ -1,0 +1,98 @@
+# k8s-forecast-deployment.yaml - Forecast API Deployment for Kubernetes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: forecast-api
+  namespace: smart-dispatch
+  labels:
+    app: forecast-api
+    component: forecasting
+    version: v1.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: forecast-api
+  template:
+    metadata:
+      labels:
+        app: forecast-api
+        component: forecasting
+        version: v1.0
+    spec:
+      containers:
+      - name: forecast-api
+        image: smart-dispatch-forecast:latest
+        imagePullPolicy: Never  # Use local image
+        ports:
+        - containerPort: 5001
+          name: http
+        env:
+        - name: FLASK_ENV
+          value: "production"
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        resources:
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 2
+        volumeMounts:
+        - name: market-data
+          mountPath: /app/market_data.db
+          subPath: market_data.db
+          readOnly: true
+      volumes:
+      - name: market-data
+        hostPath:
+          path: /tmp/smart-dispatch-data
+          type: DirectoryOrCreate
+      restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: forecast-api-service
+  namespace: smart-dispatch
+  labels:
+    app: forecast-api
+    component: forecasting
+spec:
+  selector:
+    app: forecast-api
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5001
+    protocol: TCP
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: forecast-config
+  namespace: smart-dispatch
+data:
+  FLASK_ENV: "production"
+  PYTHONUNBUFFERED: "1"
+  LOG_LEVEL: "INFO"
